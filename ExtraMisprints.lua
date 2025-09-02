@@ -8,21 +8,16 @@ SMODS.Atlas({
     py = 95
 })
 
+-- Cryptid exclusive decks
 
 -- Extreme Misprint Deck
 -- Code lifted/adapted from Cryptid source code
 SMODS.Back({
     dependencies = {
+        "Cryptid",
         items = {
             "set_cry_deck",
         },
-    },
-    -- TODO: put in separate localization file
-    loc_txt = {
-        name = "Extreme Misprinted Deck",
-        text = {
-            "Misprintizes values between", "{s:1.1}0.005x and 200x{}", "of their original values"
-        }
     },
     key = "extreme",
     order = 1,
@@ -30,8 +25,8 @@ SMODS.Back({
     pos = { x = 0, y = 0 },
     atlas = "deck_atlas",
     apply = function(self)
-    G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
-    G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
+        G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
+        G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
     end
 })
 
@@ -39,16 +34,10 @@ SMODS.Back({
 -- Code lifted/adapted from Cryptid source code
 SMODS.Back({
     dependencies = {
+        "Cryptid",
         items = {
             "set_cry_deck",
         },
-    },
-    -- TODO: put in separate localization file
-    loc_txt = {
-        name = "Maxima Misprinted Deck",
-        text = {
-            "Misprintizes values between", "{s:1.2}0.0000005x and 2000000x{}", "of their original values", "{s:0.85,C:inactive}Watch out! You're gonna crash! Ahhh!{}"
-        }
     },
     key = "maxima",
     order = 2,
@@ -56,27 +45,20 @@ SMODS.Back({
     pos = { x = 2, y = 0 },
     atlas = "deck_atlas",
     apply = function(self)
-    G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
-    G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
+        G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
+        G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
     end
 })
 
 -- Misprint Red Deck
 SMODS.Back({
-    -- TODO: put in separate localization file
-    loc_txt = {
-        name = "Misprinted Red Deck",
-        text = {
-            "May {C:attention}permanently{} give or take", "a {C:red}discard{} at {C:attention,E:1}random{}", "when selecting a blind"
-        }
-    },
-    key = "mis_red",
+    key = "red",
     order = 3,
     pos = { x = 0, y = 1 },
     atlas = "deck_atlas",
     calculate = function(self, card, context)
         if context.setting_blind then
-            pseudoseed("mis_red".. G.GAME.round_resets.ante)
+            pseudoseed("exmis_red".. G.GAME.round_resets.ante)
             local delta = math.random(-1,1)
             if G.GAME.round_resets.discards <= 0 and delta == -1 then delta = 0 end
             G.GAME.round_resets.discards = G.GAME.round_resets.discards + delta
@@ -87,20 +69,13 @@ SMODS.Back({
 
 -- Misprint Blue Deck
 SMODS.Back({
-    -- TODO: put in separate localization file
-    loc_txt = {
-        name = "Misprinted Blue Deck",
-        text = {
-            "May {C:attention}permanently{} give or take", "a {C:blue}hand{} at {C:attention,E:1}random{}", "when selecting a blind"
-        }
-    },
-    key = "mis_blue",
+    key = "blue",
     order = 4,
     pos = { x = 1, y = 1 },
     atlas = "deck_atlas",
     calculate = function(self, card, context)
         if context.setting_blind then
-            pseudoseed("mis_blue".. G.GAME.round_resets.ante)
+            pseudoseed("exmis_blue".. G.GAME.round_resets.ante)
             local delta = math.random(-1,1)
             if G.GAME.round_resets.hands <= 1 and delta == -1 then delta = 0 end
             G.GAME.round_resets.hands = G.GAME.round_resets.hands + delta
@@ -117,14 +92,7 @@ SMODS.Sound({
 
 -- Misprint Plasma Deck
 SMODS.Back({
-    -- TODO: put in separate localization file
-    loc_txt = {
-        name = "Misprinted Plasma Deck",
-        text = {
-            "Balances...? {C:blue}Chips{} and {C:red}Mult{}", "at end of scoring"
-        }
-    },
-    key = "mis_plasma",
+    key = "plasma",
     order = 5,
     pos = { x = 2, y = 1 },
     atlas = "deck_atlas",
@@ -132,7 +100,7 @@ SMODS.Back({
         if context.context == "final_scoring_step" then
             -- copy-paste from plasma deck
             local tot = context.chips + context.mult
-            pseudoseed("mis_plasma".. G.GAME.round_resets.ante)
+            pseudoseed("exmis_plasma".. G.GAME.round_resets.ante)
             local rand = math.random()
             context.chips = tot * rand
             context.mult = tot * (1 - rand)
@@ -181,6 +149,28 @@ SMODS.Back({
     end
 })
 
+-- Misprint Erratic Deck
+SMODS.Back({
+    key = "erratic",
+    order = 6,
+    pos = { x = 2, y = 1 },
+    atlas = "deck_atlas",
+    apply = function(self)
+        G.GAME.starting_params.erratic_suits_and_ranks = true
+    end,
+    calculate = function(self, card, context)
+        if context.context == "eval" then
+            if G.GAME.last_blind and G.GAME.last_blind.boss then
+                for i = 1, #G.playing_cards, 1 do
+                    local suit = pseudorandom_element(SMODS.Suits, pseudoseed("exmis_erratic"))
+                    local rank = pseudorandom_element(SMODS.Ranks, pseudoseed("exmis_erratic"))
+                    G.playing_cards[i] = assert(SMODS.change_base(G.playing_cards[i], suit.key, rank.key))
+                end
+            end
+        end
+    end
+})
+
 ---------- SLEEVES ----------
 if CardSleeves then
     -- The sleeves atlas
@@ -191,16 +181,14 @@ if CardSleeves then
         py = 95
     })
 
+    -- Cryptid exclusive sleeves
+
     -- Extreme Misprint sleeve
     -- Code lifted/adapted from Cryptid source code
     CardSleeves.Sleeve({
         key = "extreme_sleeve",
-        -- TODO: put in separate localization file
-        loc_txt = {
-            name = "Extreme Misprinted Sleeve",
-            text = {
-                "Misprintizes values between", "{s:1.1}0.005x and 200x{}", "of their original values"
-            }
+        dependencies = {
+            "Cryptid"
         },
         atlas = "sleeve_atlas",
         pos = { x = 0, y = 0 },
@@ -208,19 +196,14 @@ if CardSleeves then
         apply = function(self)
             G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
             G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
-            -- if self.get_current_deck_key() == "b_cry_antimatter" then G.GAME.modifiers.cry_misprint_min = 1 end
         end
     })
     -- Maxima Misprint sleeve
     -- Code lifted/adapted from Cryptid source code
     CardSleeves.Sleeve({
         key = "maxima_sleeve",
-        -- TODO: put in separate localization file
-        loc_txt = {
-            name = "Maxima Misprinted Sleeve",
-            text = {
-                "Misprintizes values between", "{s:1.2}0.0000005x and 2000000x{}", "of their original values", "{s:0.85,C:inactive}Watch out! You're gonna crash! Ahhh!{}"
-            }
+        dependencies = {
+            "Cryptid"
         },
         atlas = "sleeve_atlas",
         pos = { x = 0, y = 1 },
@@ -228,7 +211,35 @@ if CardSleeves then
         apply = function(self)
         G.GAME.modifiers.cry_misprint_min = (G.GAME.modifiers.cry_misprint_min or 1) * self.config.cry_misprint_min
         G.GAME.modifiers.cry_misprint_max = (G.GAME.modifiers.cry_misprint_max or 1) * self.config.cry_misprint_max
-        -- if self.get_current_deck_key() == "b_cry_antimatter" then G.GAME.modifiers.cry_misprint_min = 1 end
+        end
+    })
+
+    -- Erratic Sleeve
+    CardSleeves.Sleeve({
+        key = "erratic_sleeve",
+        atlas = "sleeve_atlas",
+        pos = { x = 0, y = 1 },
+        apply = function(self)
+            G.GAME.starting_params.erratic_suits_and_ranks = true           
+        end,
+        calculate = function(self, card, context)
+            if context.context == "eval" then
+                if G.GAME.last_blind and G.GAME.last_blind.boss then
+                    for i = 1, #G.playing_cards, 1 do
+                        local suit = pseudorandom_element(SMODS.Suits, pseudoseed("exmis_erratic"))
+                        local rank = pseudorandom_element(SMODS.Ranks, pseudoseed("exmis_erratic"))
+                        G.playing_cards[i] = assert(SMODS.change_base(G.playing_cards[i], suit.key, rank.key))
+                        if self.get_current_deck_key() == "b_exmis_erratic" then
+                            local enhancement = pseudorandom_element(G.P_CENTER_POOLS["Enhanced"], pseudoseed("exmis_erratic")).key
+                            local edition = pseudorandom_element(G.P_CENTER_POOLS["Edition"], pseudoseed("exmis_erratic")).key
+                            local seal = pseudorandom_element(G.P_CENTER_POOLS.Seal, pseudoseed("exmis_erratic")).key
+                            G.playing_cards[i]:set_ability(enhancement, true, true)
+                            G.playing_cards[i]:set_edition(edition, true, true)
+                            G.playing_cards[i]:set_seal(seal, true, true)
+                        end
+                    end
+                end
+            end
         end
     })
 end

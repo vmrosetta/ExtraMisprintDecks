@@ -219,8 +219,16 @@ if CardSleeves then
         key = "erratic_sleeve",
         atlas = "sleeve_atlas",
         pos = { x = 0, y = 1 },
+        loc_vars = function(self)
+            local key
+            if self.get_current_deck_key() == "b_exmis_erratic" then
+                key = self.key .. "_alt"
+                return { key = key, vars = {} }
+            end
+            return { vars = {} }
+        end,
         apply = function(self)
-            G.GAME.starting_params.erratic_suits_and_ranks = true           
+            G.GAME.starting_params.erratic_suits_and_ranks = true
         end,
         calculate = function(self, card, context)
             if context.context == "eval" then

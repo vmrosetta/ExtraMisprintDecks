@@ -1,14 +1,13 @@
 {
     "name": "Extra Misprints",
     "id": "ExtraMisprints",
-    "version": "0.2",
+    "version": "0.2.1",
     "description": "Adds more misprint decks and sleeves.",
     "prefix": "exmis",
     "author": ["Rosetta", "My cat Juju"],
     "main_file": "ExtraMisprints.lua",
-    "priority": 1,
     "badge_colour": "32aabe",
     "dependencies": [
-        "Cryptid (>=0.5.5)"
+        "Steamodded (>=1.0.0~BETA-0827)"
     ]
 }
